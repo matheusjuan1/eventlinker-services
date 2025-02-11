@@ -9,6 +9,8 @@ services:
       - '3336:3306'
     networks: 
       - eventlinker-network
+    volumes:
+      - ../db/db_events.sql:/docker-entrypoint-initdb.d/db_events.sql
 networks:
   eventlinker-network:
     driver: bridge
