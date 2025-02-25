@@ -3,6 +3,7 @@ package br.com.matheusjuan.eventlinker.middleware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.matheusjuan.eventlinker.error.EventNotFoundException;
 import br.com.matheusjuan.eventlinker.model.Event;
 import br.com.matheusjuan.eventlinker.model.Subscription;
 import br.com.matheusjuan.eventlinker.model.User;
@@ -26,13 +27,21 @@ public class SubscriptionService {
 
         // recuperar evento pelo nome
         Event event = eventRepository.findByPrettyName(eventName);
-        
-        // Adiciona usuário
-        user = userRepository.save(user);
+
+        if (event == null) {
+            throw new EventNotFoundException("Evento " + eventName + " não existe");
+        }
+
+        User userRec = userRepository.findByEmail(user.getEmail());
+
+        if (userRec == null) {
+            // Adiciona usuário
+            user = userRepository.save(user);
+        }
 
         Subscription subs = new Subscription();
         subs.setEvent(event);
-        subs.setSubscriber(user);
+        subs.setSubscriber(userRec);
 
         Subscription res = subscriptionRepository.save(subs);
 
